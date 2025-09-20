@@ -16,6 +16,7 @@ CXX := g++
 # Папки
 SRC_DIR := src
 OBJ_DIR := build
+TEST_DIR := tests
 
 # Имя итогового исполняемого файла
 TARGET := cache
@@ -42,7 +43,7 @@ $(OBJ_DIR):
 	mkdir -p $@
 
 # Очистка
-clean:
+clean: 
 	rm -rf $(OBJ_DIR)/*.o
 
 # .PHONY: all clean

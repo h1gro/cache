@@ -4,6 +4,7 @@
 #include <list>
 #include <unordered_map>
 #include <assert.h>
+#include <vector>
 
 template <typename type, typename key_type = int >
 struct cache_t
@@ -35,7 +36,7 @@ struct cache_t
     }
 
 
-    void filling_cache(type* data, int data_size)
+    void filling_cache(std::vector<type> data, int data_size)
     {
         for (int i = 0; i < data_size; i++)
         {
@@ -81,6 +82,9 @@ struct cache_t
     }
 };
 
-void init_data();
+static const char* TESTS_FILE = "../tests/test.txt";
 
+void init_data();
+void ReadTests();
 #endif
+ 
