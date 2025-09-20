@@ -3,3 +3,6 @@
 
 #include "../include/cache.h"
 
+void init_data()
+{
+}

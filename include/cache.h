@@ -80,4 +80,7 @@ struct cache_t
         return 0;
     }
 };
+
+void init_data();
+
 #endif
