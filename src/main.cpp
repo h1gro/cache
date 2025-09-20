@@ -11,13 +11,14 @@ int main()
 
     cache_t<int> cache {size};
 
-    ReadTests();
+    ReadTests(cache);
 
-    std::vector<int> data = {1, 2, 1, 1, 2, 2};
-
-    cache.filling_cache(data, data.size());
-
-    cache.print_list();
+    //std::cout << "The program has finished!" << std::endl;
+//     std::vector<int> data = {1, 2, 1, 1, 2, 2};
+//
+//     cache.filling_cache(data, data.size());
+//
+//     cache.print_list();
 
     return 0;
 }
