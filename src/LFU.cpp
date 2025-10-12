@@ -1,8 +1,7 @@
 #include <iostream>
-#include <iterator>
 #include <vector>
 
-#include "../include/cache.hpp"
+#include "../include/LFU.hpp"
 
 int main()
 {
@@ -23,16 +22,7 @@ int main()
     cache_t<int, int> cache {cache_size};
 
     cache.filling_cache(data, data.size());
+    cache.print_list();
 
     return 0;
-}
-
-void PrintVector(const std::vector<int>& vec)
-{
-    for (auto it = vec.begin(); it != vec.end(); it++)
-    {
-        std::cout << *it << " ";
-    }
-
-    std::cout << std::endl;
 }

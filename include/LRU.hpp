@@ -1,5 +1,5 @@
-#ifndef CACHE
-#define CACHE
+#ifndef LRU
+#define LRU
 
 #include <list>
 #include <unordered_map>

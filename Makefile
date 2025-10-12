@@ -13,17 +13,27 @@ CXXFLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-
 
 CXX = g++
 LDFLAGS = -lgtest -lgtest_main -lpthread
+BUILD   = build
 
-cache_main: src/main.cpp include/cache.hpp
-	$(CXX) $(CXXFLAGS) src/main.cpp -o cache_main
+lfu: src/LFU.cpp include/LFU.hpp
+	$(CXX) $(CXXFLAGS) src/LFU.cpp -o $(BUILD)/lfu
 
-cache_tests: src/test.cpp include/cache.hpp
-	$(CXX) $(CXXFLAGS) src/test.cpp $(LDFLAGS) -o cache_tests
+lfu_tests: src/LFU_tests.cpp include/LFU.hpp
+	$(CXX) $(CXXFLAGS) src/LFU_tests.cpp $(LDFLAGS) -o $(BUILD)/lfu_tests
 
-test: cache_tests
-	./cache_tests
+lru: src/LRU.cpp include/LRU.hpp
+	$(CXX) $(CXXFLAGS) src/LRU.cpp -o $(BUILD)/lru
+
+lru_tests: src/LRU_tests.cpp include/LRU.hpp
+	$(CXX) $(CXXFLAGS) src/LRU_tests.cpp $(LDFLAGS) -o $(BUILD)/lru_tests
+
+lru_test: lru_tests
+	./lru_tests
+
+lfu_test: lfu_tests
+	./lfu_tests
 
 clean:
-	rm -f cache_main cache_tests
+	rm -f lru_tests lru lfu_tests lfu *.o
 
 .PHONY: test clean
