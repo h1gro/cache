@@ -6,6 +6,12 @@
 #include <unordered_map>
 #include <stack>
 
+enum cache_mode_t
+{
+    LFU_FREQ = 1,
+    IDEAL    = 2,
+};
+
 template <typename type, typename key_type = int >
 struct cache_t
 {
@@ -32,8 +38,8 @@ struct cache_t
     bool cache_full();
     void print_list();
     auto find_low_freq();
-    void look_up_update(std::vector<type> data, type element, size_t data_size);
-    void filling_cache(std::vector<type> data, size_t data_size);
+    void look_up_update(std::vector<type> data, type element, size_t data_size, cache_mode_t mode);
+    void filling_cache(std::vector<type> data, size_t data_size, cache_mode_t mode);
     auto ideal_cache_algorithm(std::vector<type> data);
     key_type slow_get_page(type element);
 };
@@ -59,11 +65,11 @@ auto cache_t<type, key_type>::find_low_freq()
 }
 
 template <typename type, typename key_type>
-void cache_t<type, key_type>::filling_cache(std::vector<type> data, size_t data_size)
+void cache_t<type, key_type>::filling_cache(std::vector<type> data, size_t data_size, cache_mode_t mode)
 {
     for (size_t i = 0; i < data_size; i++)
     {
-        look_up_update(data, data[i], data_size);
+        look_up_update(data, data[i], data_size, mode);
     }
 }
 
@@ -85,6 +91,7 @@ auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data)
         for (int data_it = 0, data_end_it = data.size(); data_it < data_end_it; data_it++)
         {
             //TODO сравнение в общем случае, для разных типов
+            //TODO случай, когда в кэше первый элемент не совпадает с future data, но в кэше ещё есть элементы, которые будут совпадать
             if (list_it->elem == data[data_it])
             {
                 cache_stack.push(list_it);
@@ -107,7 +114,7 @@ auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data)
 }
 
 template <typename type, typename key_type>
-void cache_t<type, key_type>::look_up_update(std::vector<type> data, type element, size_t data_size)
+void cache_t<type, key_type>::look_up_update(std::vector<type> data, type element, size_t data_size, cache_mode_t mode)
 {
         print_list();
         std::cout << "elem: " << element << std::endl;
@@ -121,8 +128,13 @@ void cache_t<type, key_type>::look_up_update(std::vector<type> data, type elemen
             if (cache_full())
             {
                 std::cout << "in" << std::endl;
-                //auto list_element = find_low_freq();
-                auto list_element = ideal_cache_algorithm(data);
+                list_it list_element;
+
+                if (mode == LFU_FREQ)
+                    list_element = find_low_freq();
+                else
+                    list_element = ideal_cache_algorithm(data);
+
                 std::cout << "find_low_freq: " << list_element->elem << std::endl;
                 hash.erase(slow_get_page(list_element->elem));
 
