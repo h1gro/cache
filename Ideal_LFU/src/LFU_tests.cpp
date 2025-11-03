@@ -65,4 +65,13 @@ TEST(CacheTest, HitsMisses4)
     EXPECT_EQ(cache.hash.size(), 4);
     EXPECT_EQ(cache.hits, 6);
     EXPECT_EQ(cache.misses, 9);
+
+    std::vector<int> future_data = {0, 0, 4, 1, 2, 3, 4};
+    cache.filling_cache(future_data, future_data.size(), IDEAL);
+
+    EXPECT_EQ(cache.cache_list.size(), 4);
+    EXPECT_EQ(cache.hash.size(), 4);
+    EXPECT_EQ(cache.hits, 11);
+    EXPECT_EQ(cache.misses, 11);
 }
+

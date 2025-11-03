@@ -19,13 +19,12 @@ int main()
         std::cin >> data_elem;
         data.push_back(data_elem);
     }
+
     //TODO input ideal cache
     cache_t<int, int> cache {cache_size};
 
-    std::cout << "CACHE_SIZE = " << cache.cache_size << std::endl;
-
     cache.filling_cache(data, data.size(), LFU_FREQ);
-    cache.print_list();
+    //cache.print_list();
 
     std::cout << "hits:" << cache.hits << " misses:" << cache.misses << std::endl
               << "list size: " << cache.cache_list.size() << " hash size: " << cache.hash.size() << std::endl;
@@ -38,11 +37,11 @@ int main()
         future_data.push_back(future_data_elem);
     }
 
-    cache.filling_cache(data, data.size(), IDEAL);
-    cache.print_list();
+    cache.filling_cache(future_data, future_data.size(), IDEAL);
+    //cache.print_list();
 
     std::cout << "hits:" << cache.hits << " misses:" << cache.misses << std::endl
               << "list size: " << cache.cache_list.size() << " hash size: " << cache.hash.size() << std::endl;
-    
+
     return 0;
 }

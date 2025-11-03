@@ -12,6 +12,12 @@ enum cache_mode_t
     IDEAL    = 2,
 };
 
+enum use_t
+{
+    USED     = 1,
+    NOT_USED = 0,
+};
+
 template <typename type, typename key_type = int >
 struct cache_t
 {
@@ -20,6 +26,7 @@ struct cache_t
     {
         type elem;
         int frequency;
+        use_t use_id;
     };
 
     size_t cache_size, hits = {0}, misses = {0};
@@ -38,9 +45,10 @@ struct cache_t
     bool cache_full();
     void print_list();
     auto find_low_freq();
-    void look_up_update(std::vector<type> data, type element, size_t data_size, cache_mode_t mode);
+    void look_up_update(std::vector<type> data, size_t iterator, size_t data_size, cache_mode_t mode);
     void filling_cache(std::vector<type> data, size_t data_size, cache_mode_t mode);
-    auto ideal_cache_algorithm(std::vector<type> data);
+    auto find_not_used();
+    auto ideal_cache_algorithm(std::vector<type> data, size_t current_data_it);
     key_type slow_get_page(type element);
 };
 
@@ -69,7 +77,7 @@ void cache_t<type, key_type>::filling_cache(std::vector<type> data, size_t data_
 {
     for (size_t i = 0; i < data_size; i++)
     {
-        look_up_update(data, data[i], data_size, mode);
+        look_up_update(data, i, data_size, mode);
     }
 }
 
@@ -80,88 +88,124 @@ key_type cache_t<type, key_type>::slow_get_page(type element)
 }
 
 template <typename type, typename key_type>
-auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data)
+auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data, size_t current_data_it)
 {
-    bool element_found_id = false;
+    //функция принимает в аргуентах будущую data, итератор data, на котором произошёл miss, c него начнется поиск эл-ов, совпадающих с эл-ами кэша
 
-    for (auto list_it = cache_list.begin(), list_end_it = cache_list.end(); list_it != list_end_it; list_it++)
+    size_t number_of_used_cache_elements = 0;
+    auto candidate = cache_list.begin();
+
+    //запускаем цикл на поиск элементов кэша, которые встретятся в будущей data.
+    //перебираем элементы даты
+    for (size_t data_it = current_data_it, data_end_it = data.size(); data_it < data_end_it; data_it++)
     {
-        element_found_id = false;
-
-        for (int data_it = 0, data_end_it = data.size(); data_it < data_end_it; data_it++)
+        //перебираем элементы кэша, для фиксированного элемента даты
+        for (auto list_it = cache_list.begin(), list_end_it = cache_list.end(); list_it != list_end_it; list_it++)
         {
             //TODO сравнение в общем случае, для разных типов
-            //TODO случай, когда в кэше первый элемент не совпадает с future data, но в кэше ещё есть элементы, которые будут совпадать
-            if (list_it->elem == data[data_it])
+
+            //если в кэше присутсвует элемент который встретится в data, но мы кладём этот элемент кэша в стэк (если встретили его впервые),
+            //для того, чтобы можно было доставать последний элемент очень просто
+            if ((list_it->use_id == NOT_USED) && (list_it->elem == data[data_it]))
             {
                 cache_stack.push(list_it);
 
-                element_found_id = true;
+                candidate       = list_it;
+                list_it->use_id = USED;
+
+                number_of_used_cache_elements++;
                 break;
             }
         }
-
-        if (!element_found_id)
-        {
-            return list_it;
-        }
-
     }
 
-    auto element = cache_stack.top();
-    cache_stack.pop();
-    return element;
+    //если не все элементы кэша были найдены в будущей data, то существует элемент, который не встретится,
+    //а значит его можно удалить из кэша в текущем запросе (если такой элемент не единственный, то удаляем первый такой)
+    if (number_of_used_cache_elements != cache_list.size())
+    {
+        candidate = find_not_used();
+    }
+
+    //если все элементы кэша были найдены в будущей дате, то нужно удалять из кэша, тот элемент,
+    //который встретится позже остальных, такой элемент лежит на поверхности стека, тк в стек мы элементы
+    //клали в порядке их нахождения в дате от её начала до конца
+    else
+    {
+        candidate = cache_stack.top();
+        while (!cache_stack.empty())
+        {
+            cache_stack.pop();
+        }
+    }
+
+    std::cout << candidate->elem << std::endl;
+    return candidate;
 }
 
 template <typename type, typename key_type>
-void cache_t<type, key_type>::look_up_update(std::vector<type> data, type element, size_t data_size, cache_mode_t mode)
+auto cache_t<type, key_type>::find_not_used()
 {
-        print_list();
-        std::cout << "elem: " << element << std::endl;
-        auto hash_it = hash.find(slow_get_page(element));
+    for (auto list_it = cache_list.begin(), list_end = cache_list.end(); list_it != list_end; list_it++)
+    {
+        if (list_it->use_id == NOT_USED)
+        {
+            return list_it;
+        }
+    }
+
+    std::cerr << "Error in finding unused element in cache!" << std::endl;
+    return cache_list.begin();
+}
+
+template <typename type, typename key_type>
+void cache_t<type, key_type>::look_up_update(std::vector<type> data, size_t iterator, size_t data_size, cache_mode_t mode)
+{
+        //print_list();
+        //std::cout << "elem: " << data[iterator] << std::endl;
+        auto hash_it = hash.find(slow_get_page(data[iterator]));
 
         if (hash_it == hash.end())
         {
             misses++;
-            std::cout << "misses:" << misses << std::endl;
+            //std::cout << "misses:" << misses << std::endl;
 
             if (cache_full())
             {
-                std::cout << "in" << std::endl;
+                //std::cout << "in" << std::endl;
                 list_it list_element;
 
                 if (mode == LFU_FREQ)
                     list_element = find_low_freq();
                 else
-                    list_element = ideal_cache_algorithm(data);
+                    list_element = ideal_cache_algorithm(data, iterator);
 
-                std::cout << "find_low_freq: " << list_element->elem << std::endl;
+                //std::cout << "find_useless: " << list_element->elem << std::endl;
                 hash.erase(slow_get_page(list_element->elem));
 
-                list_element->elem      = element;
+                list_element->elem      = data[iterator];
                 list_element->frequency = 0;
-                hash.emplace(slow_get_page(element), list_element);
+                hash.emplace(slow_get_page(data[iterator]), list_element);
             }
 
             else
             {
-                list_elem_t new_element = {element, 0};
+                list_elem_t new_element = {data[iterator], 0};
                 cache_list.push_front(new_element);
-                hash.emplace(slow_get_page(element), cache_list.begin());
+                hash.emplace(slow_get_page(data[iterator]), cache_list.begin());
             }
 
-            print_list();
-            std::cout << std::endl;
+            //print_list();
+            //std::cout << std::endl;
         }
 
         else
         {
             hits++;
-            std::cout << "hits:" << hits << std::endl;
-            std::cout << std::endl;
+            //std::cout << "hits:" << hits << std::endl;
             (hash_it->second->frequency)++;
-            std::cout << "hit freq = " << hash_it->second->frequency << std::endl;
-            print_list();
+            //std::cout << "hit freq = " << hash_it->second->frequency << std::endl;
+            //print_list();
+            std::cout << std::endl;
         }
 }
 
