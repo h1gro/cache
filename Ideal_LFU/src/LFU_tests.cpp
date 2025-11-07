@@ -13,65 +13,50 @@ TEST(CacheTest, Constructor)
     EXPECT_EQ(cache.hash.size(), 0);
 }
 
-TEST(CacheTest, HitsMisses1)
-{
-    cache_t<int, int> cache {3};
-    std::vector<int> data = {1, 2, 3, 4, 1, 1};
 
-    cache.filling_cache(data, data.size(), LFU_FREQ);
-
-    EXPECT_EQ(cache.cache_list.size(), 3);
-    EXPECT_EQ(cache.hash.size(), 3);
-    EXPECT_EQ(cache.hits, 1);
-    EXPECT_EQ(cache.misses, 5);
-}
-
-TEST(CacheTest, HitsMisses2)
-{
-    cache_t<int, int> cache {2};
-    std::vector<int> data = {1, 1, 1};
-
-    cache.filling_cache(data, data.size(), LFU_FREQ);
-
-    EXPECT_EQ(cache.cache_list.size(), 1);
-    EXPECT_EQ(cache.hash.size(), 1);
-    EXPECT_EQ(cache.hits, 2);
-    EXPECT_EQ(cache.misses, 1);
-}
-
-TEST(CacheTest, HitsMisses3)
-{
-    cache_t<int, int> cache {3};
-    std::vector<int> data = {3, 6, 2, 2};
-
-    cache.filling_cache(data, data.size(), LFU_FREQ);
-
-    EXPECT_EQ(cache.cache_list.size(), 3);
-    EXPECT_EQ(cache.hash.size(), 3);
-    EXPECT_EQ(cache.hits, 1);
-    EXPECT_EQ(cache.misses, 3);
-}
-
-TEST(CacheTest, HitsMisses4)
+TEST(CacheTest, IdealHits1)
 {
     cache_t<int, int> cache {4};
-    std::vector<int> data = {1, 1, 2, 3, 4,
-                             5, 3, 4, 5, 3,
-                             3, 6, 1, 2, 1};
 
-    cache.filling_cache(data, data.size(), LFU_FREQ);
+    std::vector<int> future_data = {1, 2, 3, 4, 1, 2,
+                                    5, 1, 2, 4, 3, 4};
+
+    cache.filling_cache(future_data, future_data.size());
 
     EXPECT_EQ(cache.cache_list.size(), 4);
     EXPECT_EQ(cache.hash.size(), 4);
     EXPECT_EQ(cache.hits, 6);
-    EXPECT_EQ(cache.misses, 9);
+    EXPECT_EQ(cache.misses, 6);
+}
 
-    std::vector<int> future_data = {0, 0, 4, 1, 2, 3, 4};
-    cache.filling_cache(future_data, future_data.size(), IDEAL);
+TEST(CacheTest, IdealHits2)
+{
+    cache_t<int, int> cache {3};
 
-    EXPECT_EQ(cache.cache_list.size(), 4);
-    EXPECT_EQ(cache.hash.size(), 4);
-    EXPECT_EQ(cache.hits, 11);
-    EXPECT_EQ(cache.misses, 11);
+    std::vector<int> future_data = {5, 4, 9, 9, 2,
+                                    3, 4, 5, 5, 9};
+
+    cache.filling_cache(future_data, future_data.size());
+
+    EXPECT_EQ(cache.cache_list.size(), 3);
+    EXPECT_EQ(cache.hash.size(), 3);
+    EXPECT_EQ(cache.hits, 4);
+    EXPECT_EQ(cache.misses, 6);
+}
+
+TEST(CacheTest, IdealHits3)
+{
+    cache_t<int, int> cache {3};
+
+    std::vector<int> future_data = {0, 0, 0, 2, 2,
+                                    0, 0, 2, 1, 6,
+                                    8, 9, 8, 8, 1};
+
+    cache.filling_cache(future_data, future_data.size());
+
+    EXPECT_EQ(cache.cache_list.size(), 3);
+    EXPECT_EQ(cache.hash.size(), 3);
+    EXPECT_EQ(cache.hits, 9);
+    EXPECT_EQ(cache.misses, 6);
 }
 

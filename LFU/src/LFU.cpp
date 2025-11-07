@@ -7,9 +7,7 @@ int main()
 {
     int data_elem = 0;
     size_t cache_size = 0, data_size = 0;
-    std::cout << "Enter cache size and data size" << std::endl;
-    std::cin  >> cache_size >> data_size;
-    std::cout << "Enter data:" << std::endl;
+    std::cin >> cache_size >> data_size;
 
     std::vector<int> data = {};
 
@@ -21,13 +19,8 @@ int main()
 
     cache_t<int, int> cache {cache_size};
 
-    std::cout << "CACHE_SIZE = " << cache.cache_size << std::endl;
-
     cache.filling_cache(data, data.size());
-    cache.print_list();
 
-    std::cout << "hits:" << cache.hits << " misses:" << cache.misses << std::endl
-              << "list size: " << cache.cache_list.size() << " hash size: " << cache.hash.size() << std::endl;
-
+    std::cout << cache.hits << std::endl;
     return 0;
 }
