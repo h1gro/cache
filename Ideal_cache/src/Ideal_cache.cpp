@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../include/LFU.hpp"
+#include "../include/Ideal_cache.hpp"
 
 int main()
 {

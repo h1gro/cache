@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <gtest/gtest.h>
-#include "../include/LFU.hpp"
+#include "../include/Ideal_cache.hpp"
 
 TEST(CacheTest, Constructor)
 {

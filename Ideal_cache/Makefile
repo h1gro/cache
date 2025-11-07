@@ -31,15 +31,15 @@ endif
 
 LDFLAGS = -lgtest -lgtest_main -lpthread
 
-all: lfu lfu_tests
+all: ideal_cache ideal_cache_tests
 
-lfu: src/LFU.cpp include/LFU.hpp
+ideal_cache: src/Ideal_cache.cpp include/Ideal_cache.hpp
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) src/LFU.cpp -o $(BUILD_DIR)/lfu
+	$(CXX) $(CXXFLAGS) src/Ideal_cache.cpp -o $(BUILD_DIR)/ideal_cache
 
-lfu_tests: src/LFU_tests.cpp include/LFU.hpp
+ideal_cache_tests: src/Ideal_cache_tests.cpp include/Ideal_cache.hpp
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) src/LFU_tests.cpp $(LDFLAGS) -o $(BUILD_DIR)/lfu_tests
+	$(CXX) $(CXXFLAGS) src/Ideal_cache_tests.cpp $(LDFLAGS) -o $(BUILD_DIR)/ideal_cache_tests
 
 debug:
 	$(MAKE) CONFIG=debug
