@@ -89,6 +89,7 @@ auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data, size
 {
     //функция принимает в аргуентах будущую data, итератор data, на котором произошёл miss, c него начнется поиск эл-ов, совпадающих с эл-ами кэша
 
+    bool element_is_the_only_one = true;
     size_t number_of_used_cache_elements = 0;
     auto candidate = cache_list.begin();
 
@@ -161,23 +162,37 @@ template <typename type, typename key_type>
 void cache_t<type, key_type>::look_up_update(std::vector<type> data, size_t iterator)
 {
         //print_list();
+        bool element_is_the_only_one = true;
         auto hash_it = hash.find(slow_get_page(data[iterator]));
 
         if (hash_it == hash.end())
         {
             misses++;
-
+            
             if (cache_full())
             {
                 list_it list_element;
 
-                list_element = ideal_cache_algorithm(data, iterator);
+                for (size_t next_data_it = iterator + 1, data_end_it = data.size(); next_data_it < data_end_it; next_data_it++)
+                {
+                    if (data[next_data_it] == data[iterator])
+                    {
+                        //элемент даты ещё как минимум один раз встретится в дате
+                        element_is_the_only_one = false;
+                        break;
+                    }
+                }
 
-                hash.erase(slow_get_page(list_element->elem));
+                if (!element_is_the_only_one)
+                {
+                    list_element = ideal_cache_algorithm(data, iterator);
 
-                list_element->elem      = data[iterator];
-                list_element->frequency = 0;
-                hash.emplace(slow_get_page(data[iterator]), list_element);
+                    hash.erase(slow_get_page(list_element->elem));
+
+                    list_element->elem      = data[iterator];
+                    list_element->frequency = 0;
+                    hash.emplace(slow_get_page(data[iterator]), list_element);
+                }
             }
 
             else
