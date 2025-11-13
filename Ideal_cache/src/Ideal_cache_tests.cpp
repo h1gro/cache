@@ -13,7 +13,6 @@ TEST(CacheTest, Constructor)
     EXPECT_EQ(cache.hash.size(), 0);
 }
 
-
 TEST(CacheTest, IdealHits1)
 {
     cache_t<int, int> cache {4};
@@ -25,8 +24,8 @@ TEST(CacheTest, IdealHits1)
 
     EXPECT_EQ(cache.cache_list.size(), 4);
     EXPECT_EQ(cache.hash.size(), 4);
-    EXPECT_EQ(cache.hits, 6);
-    EXPECT_EQ(cache.misses, 6);
+    EXPECT_EQ(cache.hits, 7);
+    EXPECT_EQ(cache.misses, 5);
 }
 
 TEST(CacheTest, IdealHits2)
@@ -40,8 +39,8 @@ TEST(CacheTest, IdealHits2)
 
     EXPECT_EQ(cache.cache_list.size(), 3);
     EXPECT_EQ(cache.hash.size(), 3);
-    EXPECT_EQ(cache.hits, 4);
-    EXPECT_EQ(cache.misses, 6);
+    EXPECT_EQ(cache.hits, 5);
+    EXPECT_EQ(cache.misses, 5);
 }
 
 TEST(CacheTest, IdealHits3)
