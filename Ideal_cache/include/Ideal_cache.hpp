@@ -74,7 +74,7 @@ void cache_t<type, key_type>::filling_cache(std::vector<type> data, size_t data_
 {
     for (size_t i = 0; i < data_size; i++)
     {
-        look_up_update(data, i);
+        look_up_update(data, i); 
     }
 }
 
@@ -88,8 +88,6 @@ template <typename type, typename key_type>
 auto cache_t<type, key_type>::ideal_cache_algorithm(std::vector<type> data, size_t current_data_it)
 {
     //функция принимает в аргуентах будущую data, итератор data, на котором произошёл miss, c него начнется поиск эл-ов, совпадающих с эл-ами кэша
-
-    bool element_is_the_only_one = true;
     size_t number_of_used_cache_elements = 0;
     auto candidate = cache_list.begin();
 
@@ -168,7 +166,7 @@ void cache_t<type, key_type>::look_up_update(std::vector<type> data, size_t iter
         if (hash_it == hash.end())
         {
             misses++;
-            
+
             if (cache_full())
             {
                 list_it list_element;
